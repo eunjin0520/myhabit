@@ -1,99 +1,137 @@
 /**
- * 1단계 확인용 임시 화면입니다.
- * 데이터·날짜 로직이 실제 브라우저(IndexedDB)에서 동작하는지 눌러 보는 용도이고,
- * 2단계에서 계획서 6장의 정식 화면(오늘 · 기록 · 습관 탭)으로 교체합니다.
+ * 앱 뼈대: 하단 탭 3개(오늘 · 기록 · 습관) + 추가/수정 창 + 삭제 확인 창 + 안내 메시지
  */
-import { useCallback, useEffect, useState, type FormEvent } from 'react';
-import { addDays, formatDayLabel, todayKey } from './core/dayKey';
-import {
-  addHabit,
-  countLogs,
-  deleteHabit,
-  getDayView,
-  toggleCheck,
-  type DayView,
-} from './core/habitStore';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { Dialog } from './components/Dialog';
+import { Toast, type ToastMessage } from './components/Toast';
+import { countLogs, deleteHabit } from './core/habitStore';
+import type { Habit } from './core/db';
+import type { DayKey } from './core/dayKey';
+import { useToday } from './hooks/useToday';
+import { TodayPage } from './features/today/TodayPage';
+import { HistoryPage } from './features/history/HistoryPage';
+import { HabitsPage } from './features/habits/HabitsPage';
+import { EDITOR_TITLE_ID, HabitEditor } from './features/habits/HabitEditor';
+import { DELETE_DESC_ID, DELETE_TITLE_ID, DeleteConfirm } from './features/habits/DeleteConfirm';
+import styles from './App.module.css';
+
+type Tab = 'today' | 'history' | 'habits';
+type EditorState = { mode: 'add' } | { mode: 'edit'; habit: Habit } | null;
+
+const TABS: Array<{ id: Tab; label: string; icon: string }> = [
+  { id: 'today', label: '오늘', icon: 'M5 12.5l4.5 4.5L19 7.5' },
+  { id: 'history', label: '기록', icon: 'M4 6h16v14H4zM4 10h16M9 3v4M15 3v4' },
+  { id: 'habits', label: '습관', icon: 'M4 6h16M4 12h16M4 18h16' },
+];
 
 export function App() {
-  const [day, setDay] = useState(todayKey());
-  const [view, setView] = useState<DayView | null>(null);
-  const [name, setName] = useState('');
-  const [error, setError] = useState('');
+  const today = useToday();
+  const [tab, setTab] = useState<Tab>('today');
+  const [day, setDay] = useState<DayKey>(today);
+  const [editor, setEditor] = useState<EditorState>(null);
+  const [confirm, setConfirm] = useState<{ habit: Habit; count: number } | null>(null);
+  const [toast, setToast] = useState<ToastMessage | null>(null);
 
-  const reload = useCallback(async () => setView(await getDayView(day)), [day]);
+  // 자정이 지나면: 오늘을 보고 있었다면 새 오늘로 이동 (지난 날을 보고 있었다면 그대로)
+  const prevToday = useRef(today);
   useEffect(() => {
-    void reload();
-  }, [reload]);
+    if (prevToday.current === today) return;
+    const old = prevToday.current;
+    prevToday.current = today;
+    setDay((d) => (d === old ? today : d));
+  }, [today]);
 
-  const today = todayKey();
+  const showToast = useCallback((text: string) => setToast({ id: Date.now(), text }), []);
+  const clearToast = useCallback(() => setToast(null), []);
 
-  async function run(fn: () => Promise<unknown>) {
-    setError('');
+  async function requestDelete(habit: Habit) {
+    const count = await countLogs(habit.id); // 삭제 전에 기록 수를 세어 둠
+    setConfirm({ habit, count });
+  }
+
+  async function confirmDelete() {
+    if (!confirm) return;
     try {
-      await fn();
-      await reload();
-    } catch (e) {
-      setError(e instanceof Error ? e.message : String(e));
+      await deleteHabit(confirm.habit.id);
+      setConfirm(null);
+      setEditor(null);
+      setTab('habits');
+      showToast('습관을 삭제했어요');
+    } catch {
+      setConfirm(null);
+      showToast('삭제하지 못했어요. 다시 시도해 주세요.');
     }
   }
 
-  function onAdd(e: FormEvent) {
-    e.preventDefault();
-    const value = name;
-    setName(''); // 저장이 끝나기 전에 바로 비워서, 빠르게 두 번 입력해도 이름이 이어 붙지 않게
-    void run(() => addHabit({ name: value, colorIndex: 0 }));
-  }
-
   return (
-    <main style={{ maxWidth: 420, margin: '0 auto', padding: 16, fontFamily: 'system-ui, sans-serif' }}>
-      <p style={{ fontSize: 12, color: '#888' }}>1단계 확인용 임시 화면</p>
-      <h1 style={{ fontSize: 22 }}>마이해빗</h1>
+    <div className={styles.app}>
+      <main className={styles.main}>
+        {tab === 'today' && (
+          <TodayPage
+            day={day}
+            today={today}
+            onChangeDay={setDay}
+            onAddHabit={() => setEditor({ mode: 'add' })}
+            onError={showToast}
+          />
+        )}
+        {tab === 'history' && <HistoryPage />}
+        {tab === 'habits' && (
+          <HabitsPage
+            onAdd={() => setEditor({ mode: 'add' })}
+            onEdit={(habit) => setEditor({ mode: 'edit', habit })}
+          />
+        )}
+      </main>
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-        <button onClick={() => setDay(addDays(day, -1))} aria-label="이전 날">‹</button>
-        <strong>{formatDayLabel(day)}</strong>
-        <button onClick={() => setDay(addDays(day, 1))} disabled={day >= today} aria-label="다음 날">›</button>
-        {day !== today && <button onClick={() => setDay(today)}>오늘</button>}
-      </div>
-
-      {view && (
-        <p>
-          {view.progress.total === 0
-            ? '첫 습관을 추가해 보세요'
-            : `${view.progress.done} / ${view.progress.total} 완료`}
-        </p>
-      )}
-
-      <ul style={{ listStyle: 'none', padding: 0 }}>
-        {view?.habits.map((h) => (
-          <li key={h.id} style={{ display: 'flex', gap: 8, alignItems: 'center', padding: '6px 0' }}>
-            <button
-              onClick={() => void run(() => toggleCheck(h.id, day))}
-              aria-label={`${h.name}, ${h.checked ? '완료' : '미완료'}`}
-              style={{ flex: 1, textAlign: 'left', padding: 10, opacity: h.checked ? 0.6 : 1 }}
-            >
-              {h.checked ? '●' : '○'} {h.name} · 연속 {h.streak}일
-            </button>
-            <button
-              onClick={() =>
-                void run(async () => {
-                  const n = await countLogs(h.id);
-                  if (confirm(`"${h.name}" 습관을 삭제할까요? 체크 기록 ${n}개도 함께 지워져요.`))
-                    await deleteHabit(h.id);
-                })
-              }
-            >
-              삭제
-            </button>
-          </li>
+      <nav className={styles.tabbar} aria-label="메뉴">
+        {TABS.map((t) => (
+          <button
+            key={t.id}
+            className={`${styles.tab} ${tab === t.id ? styles.tabActive : ''}`}
+            aria-current={tab === t.id ? 'page' : undefined}
+            onClick={() => {
+              setTab(t.id);
+              if (t.id === 'today' && tab === 'today') setDay(today); // 오늘 탭을 한 번 더 누르면 오늘로
+            }}
+          >
+            <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
+              <path d={t.icon} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+            <span>{t.label}</span>
+          </button>
         ))}
-      </ul>
+      </nav>
 
-      <form onSubmit={onAdd} style={{ display: 'flex', gap: 8 }}>
-        <input value={name} onChange={(e) => setName(e.target.value)} placeholder="습관 이름" style={{ flex: 1 }} />
-        <button disabled={name.trim() === ''}>추가</button>
-      </form>
-      {error && <p style={{ color: 'crimson' }}>{error}</p>}
-    </main>
+      <Dialog open={editor !== null} onClose={() => setEditor(null)} variant="sheet" labelledBy={EDITOR_TITLE_ID}>
+        {editor && (
+          <HabitEditor
+            key={editor.mode === 'edit' ? editor.habit.id : 'new'}
+            habit={editor.mode === 'edit' ? editor.habit : undefined}
+            onClose={() => setEditor(null)}
+            onRequestDelete={(h) => void requestDelete(h)}
+          />
+        )}
+      </Dialog>
+
+      <Dialog
+        open={confirm !== null}
+        onClose={() => setConfirm(null)}
+        variant="alert"
+        labelledBy={DELETE_TITLE_ID}
+        describedBy={DELETE_DESC_ID}
+      >
+        {confirm && (
+          <DeleteConfirm
+            name={confirm.habit.name}
+            logCount={confirm.count}
+            onCancel={() => setConfirm(null)}
+            onConfirm={confirmDelete}
+          />
+        )}
+      </Dialog>
+
+      <Toast message={toast} onDone={clearToast} />
+    </div>
   );
 }

@@ -1,0 +1,57 @@
+.dialog {
+  padding: 0;
+  border: none;
+  background: var(--surface);
+  color: var(--text);
+  max-width: 480px;
+  width: 100%;
+}
+
+.dialog::backdrop {
+  background: var(--backdrop);
+}
+
+.body {
+  padding: 20px 20px calc(20px + var(--safe-bottom));
+}
+
+/* 아래에서 올라오는 창 */
+.sheet {
+  margin: auto auto 0;
+  border-radius: 20px 20px 0 0;
+  max-height: 92dvh;
+  overflow-y: auto;
+}
+
+.sheet[open] {
+  animation: slide-up 0.24s ease-out;
+}
+
+/* 가운데 확인 창 */
+.alert {
+  margin: auto;
+  width: calc(100% - 40px);
+  max-width: 360px;
+  border-radius: 18px;
+}
+
+.alert .body {
+  padding: 22px 20px 18px;
+}
+
+.alert[open] {
+  animation: pop-in 0.18s ease-out;
+}
+
+@keyframes slide-up {
+  from {
+    transform: translateY(100%);
+  }
+}
+
+@keyframes pop-in {
+  from {
+    transform: scale(0.94);
+    opacity: 0;
+  }
+}

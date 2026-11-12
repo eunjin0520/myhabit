@@ -1,0 +1,258 @@
+.page {
+  padding: 8px 16px 24px;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 8px 0 16px;
+}
+
+/* ‹ 날짜 › */
+.dateBar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.navBtn {
+  width: 44px;
+  height: 44px;
+  border: none;
+  border-radius: 12px;
+  background: transparent;
+  font-size: 1.75rem;
+  line-height: 1;
+  color: var(--text);
+}
+
+.navBtn:disabled {
+  color: var(--text-3);
+  opacity: 0.4;
+}
+
+.navBtn:not(:disabled):active {
+  background: var(--surface-2);
+}
+
+.dateLabel {
+  position: relative;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 6px;
+  font-size: 1.125rem;
+  font-weight: 700;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+/* 날짜 글자 위에 투명하게 덮어서, 누르면 휴대폰 날짜 선택기가 열림 */
+.dateInput {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+  border: none;
+}
+
+.dateInput::-webkit-calendar-picker-indicator {
+  position: absolute;
+  inset: 0;
+  width: auto;
+  height: auto;
+  cursor: pointer;
+}
+
+.dateLabel:focus-within {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.todayBtn {
+  margin-left: auto;
+  min-height: 36px;
+  padding: 0 14px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+/* 달성률 링 */
+.ring {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  background: var(--surface);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.ringTrack {
+  fill: none;
+  stroke: var(--surface-2);
+}
+
+.ringValue {
+  fill: none;
+  stroke: var(--accent);
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.4s ease;
+}
+
+.ringCheck {
+  stroke: var(--accent);
+  stroke-dasharray: 30;
+  stroke-dashoffset: 30;
+  animation: draw 0.35s 0.3s ease-out forwards;
+}
+
+.ringComplete svg {
+  animation: ring-pop 0.5s 0.25s ease-out;
+}
+
+.ringText {
+  font-size: 1.0625rem;
+  color: var(--text-2);
+}
+
+.ringText strong {
+  color: var(--text);
+  font-size: 1.25rem;
+}
+
+@keyframes draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes ring-pop {
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+/* 습관 목록 */
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.row {
+  width: 100%;
+  min-height: 64px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border: none;
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  text-align: left;
+  transition: background 0.15s;
+}
+
+.row:active {
+  background: var(--surface-2);
+}
+
+.emoji {
+  flex: none;
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  font-size: 1.25rem;
+  background: color-mix(in srgb, var(--c) 16%, transparent);
+  color: var(--c);
+}
+
+.rowText {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.name {
+  font-size: 1.0625rem;
+  font-weight: 600;
+  transition: color 0.15s;
+}
+
+.streak {
+  font-size: 0.8125rem;
+  color: var(--text-2);
+}
+
+.circle {
+  flex: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2.5px solid var(--c);
+  display: grid;
+  place-items: center;
+  color: var(--surface);
+  transition: background 0.15s;
+}
+
+.rowChecked .circle {
+  background: var(--c);
+}
+
+.rowChecked .name {
+  color: var(--text-3);
+}
+
+.pop {
+  animation: pop 0.3s ease-out;
+}
+
+@keyframes pop {
+  40% {
+    transform: scale(1.25);
+  }
+}
+
+/* 습관 0개 */
+.empty {
+  text-align: center;
+  padding: 48px 16px;
+}
+
+.emptyTitle {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0 0 6px;
+}
+
+.emptyText {
+  color: var(--text-2);
+  margin: 0 0 20px;
+}
+
+.primaryBtn {
+  min-height: 48px;
+  padding: 0 24px;
+  border: none;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--accent-text);
+  font-weight: 700;
+  font-size: 1rem;
+}

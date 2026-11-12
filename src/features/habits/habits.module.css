@@ -1,0 +1,280 @@
+.page {
+  padding: 8px 16px 24px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  min-height: 60px;
+}
+
+.title {
+  font-size: 1.5rem;
+  margin: 0;
+}
+
+.empty {
+  color: var(--text-2);
+  padding: 24px 0;
+  text-align: center;
+}
+
+.list {
+  list-style: none;
+  margin: 0 0 16px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 6px 6px 0;
+  background: var(--surface);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.rowMain {
+  flex: 1;
+  min-width: 0;
+  min-height: 52px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 4px 8px 4px 14px;
+  border: none;
+  background: transparent;
+  text-align: left;
+  border-radius: var(--radius);
+}
+
+.emoji {
+  flex: none;
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  font-size: 1.25rem;
+  background: color-mix(in srgb, var(--c) 16%, transparent);
+  color: var(--c);
+}
+
+.name {
+  font-size: 1.0625rem;
+  font-weight: 600;
+}
+
+.moveBtn {
+  flex: none;
+  width: 44px;
+  height: 44px;
+  border: none;
+  border-radius: 10px;
+  background: var(--surface-2);
+  font-size: 1.125rem;
+}
+
+.moveBtn:disabled {
+  opacity: 0.3;
+}
+
+.addBtn {
+  width: 100%;
+  min-height: 52px;
+  border: 1.5px dashed var(--border);
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--accent);
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+/* ---------- 추가/수정 창 ---------- */
+.editor {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.editorTitle {
+  font-size: 1.25rem;
+  margin: 0;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border: none;
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+}
+
+.fieldLabel {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-2);
+  padding: 0;
+}
+
+.input {
+  min-height: 48px;
+  padding: 0 14px;
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  background: var(--bg);
+  font-size: 1.0625rem; /* 16px 이상: 아이폰에서 입력할 때 화면이 확대되지 않음 */
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.input[aria-invalid='true'] {
+  border-color: var(--danger);
+}
+
+.count {
+  font-size: 0.8125rem;
+  color: var(--text-3);
+  align-self: flex-end;
+}
+
+.countOver {
+  color: var(--danger);
+}
+
+.emojiGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(44px, 1fr));
+  gap: 6px;
+}
+
+.emojiBtn {
+  height: 44px;
+  border: 1.5px solid transparent;
+  border-radius: 10px;
+  background: var(--surface-2);
+  font-size: 1.375rem;
+  line-height: 1;
+}
+
+.noneText {
+  font-size: 0.75rem;
+  color: var(--text-2);
+}
+
+.selected {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 14%, var(--surface));
+}
+
+.colorRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.colorBtn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 3px solid var(--surface);
+  box-shadow: 0 0 0 1px var(--border);
+}
+
+.colorSelected {
+  box-shadow: 0 0 0 3px var(--text);
+}
+
+.error {
+  color: var(--danger);
+  margin: 0;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+}
+
+.secondaryBtn,
+.saveBtn,
+.dangerBtn {
+  flex: 1;
+  min-height: 50px;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.secondaryBtn {
+  border: none;
+  background: var(--surface-2);
+}
+
+.saveBtn {
+  border: none;
+  background: var(--accent);
+  color: var(--accent-text);
+}
+
+.saveBtn:disabled {
+  opacity: 0.4;
+}
+
+.dangerBtn {
+  border: none;
+  background: var(--danger);
+  color: var(--danger-text);
+}
+
+.dangerBtn:disabled {
+  opacity: 0.6;
+}
+
+.deleteLink {
+  align-self: center;
+  min-height: 44px;
+  padding: 0 16px;
+  border: none;
+  background: transparent;
+  color: var(--danger);
+  font-weight: 600;
+}
+
+/* ---------- 삭제 확인 창 ---------- */
+.confirm {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.confirmTitle {
+  font-size: 1.125rem;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.confirmBody {
+  margin: 0;
+  color: var(--text);
+}
+
+.confirmHelp {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--text-2);
+}
+
+.confirmActions {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+}
